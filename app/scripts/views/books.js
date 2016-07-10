@@ -1,42 +1,69 @@
-var Backbone = require('backbone');
 var $ = require('jquery');
+var Backbone = require('backbone');
+var bookItemTemplate = require('../../templates/booklist.hbs');
+var formTemplate = require('../../templates/bookform.hbs');
+var bookDetailTemplate = require('../../templates/bookdetail.hbs');
 
 var BookFormView = Backbone.View.extend({
   tagName: 'form',
-  template: bookFormTemplate,
+  template: formTemplate,
   events: {
-    'submit': 'contactForm'
+    'submit': 'addBook'
   },
   render: function(){
-    var renderedHTML = this.template();
-    this.$el.html(renderedHTML);
+    var renderedHtml = this.template();
+    this.$el.html(renderedHtml);
     return this;
   },
-
-  bookForm: function(event){
-    event.preventDeault();
+  addBook: function(event){
+    event.preventDefault();
     this.collection.create({
-      name: $('name').val(),
-      publish: $('publish').val(),
+      name: $('#name').val(),
+      url: $('#url').val()
     });
-  },
+
+    $('#name').val('');
+    $('#url').val('');
+  }
 });
 
-var bookListView = Backbone.View.extend({
+var BookListView = Backbone.View.extend({
   tagName: 'ul',
-
   initialize: function(){
     this.listenTo(this.collection, 'add', this.renderItem);
   },
   render: function(){
-      return this;
+    return this;
   },
-  renderItem: function(bookId){
-    var book = new BookItemView({model: book});
-    this.$el.append(book.render().el);
-  },
-
+  renderItem: function(book){
+    console.log('book', book);
+    var bookItem = new BookItemView({model: book});
+    this.$el.append(bookItem.render().el);
+  }
 });
 
-module.exports =
-''
+var BookItemView = Backbone.View.extend({
+  tagName: 'li',
+  template: bookItemTemplate,
+  render: function(){
+    var context = this.model.toJSON();
+    this.$el.html(this.template(context));
+    return this;
+  }
+});
+
+var BookDetailView = Backbone.View.extend({
+  tagName: 'div',
+  template: bookDetailTemplate,
+  render: function(){
+    this.$el.html('<img src="' + this.model.get('url') + '"/>' + this.template(this.model.toJSON()));
+    return this;
+  }
+});
+
+module.exports = {
+  'BookFormView': BookFormView,
+  'BookListView': BookListView,
+  'BookItemView': BookItemView,
+  'BookDetailView': BookDetailView
+}

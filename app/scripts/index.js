@@ -1,5 +1,8 @@
+var $ = require('jquery');
 var Backbone = require('backbone');
-require('./router');
 
+var router = require('./router');
 
-Backbone.history.start();
+$(function(){
+  Backbone.history.start();
+});
